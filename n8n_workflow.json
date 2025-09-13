@@ -1,0 +1,227 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "value": "1XPZRFAyLgVwOjaShiPTVZhDbOHwsOxE1",
+          "mode": "list",
+          "cachedResultName": "Data Analyst Automation",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1XPZRFAyLgVwOjaShiPTVZhDbOHwsOxE1"
+        },
+        "event": "fileCreated",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "1da82231-2670-47ad-8aed-d0744879a15a",
+      "name": "Google Drive Trigger",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "YqkO82EU0RSl4R0j",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{$json[\"id\"]}}",
+          "mode": "id"
+        },
+        "options": {
+          "binaryPropertyName": "data"
+        }
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        208,
+        0
+      ],
+      "id": "e246e032-8000-484e-b7a2-a3e3eebe395e",
+      "name": "Download file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "YqkO82EU0RSl4R0j",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "table": {
+          "__rl": true,
+          "value": "=daily_update",
+          "mode": "name"
+        },
+        "dataMode": "defineBelow",
+        "valuesToSend": {
+          "values": [
+            {
+              "column": "Name",
+              "value": "={{$json[\"Name\"]}}"
+            },
+            {
+              "column": "Address",
+              "value": "={{$json[\"Address\"]}}"
+            },
+            {
+              "column": "Category",
+              "value": "={{$json[\"Category\"]}}"
+            },
+            {
+              "column": "Phone",
+              "value": "={{$json[\"Phone\"]}}"
+            },
+            {
+              "column": "Rating",
+              "value": "={{$json[\"Rating\"]}}"
+            },
+            {
+              "column": "Location",
+              "value": "={{$json[\"Location\"]}}"
+            },
+            {
+              "column": "Date",
+              "value": "={{$json[\"DateFormatted\"]}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.5,
+      "position": [
+        880,
+        0
+      ],
+      "id": "00a9cf33-a8f4-48f8-b457-44c53451b6ed",
+      "name": "Insert rows in a table",
+      "credentials": {
+        "mySql": {
+          "id": "0rer7bPb8O5sjY3M",
+          "name": "MySQL account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "xlsx",
+        "options": {
+          "headerRow": true
+        }
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        432,
+        0
+      ],
+      "id": "ab88e39e-fc8b-4315-a608-67880b1187a5",
+      "name": "Extract from File"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ed49703c-a07a-4004-a573-d13b9c8212e4",
+              "name": "DateFormatted",
+              "value": "={{ new Date((Number($json[\"Date\"]) - 25569) * 86400000).toISOString().slice(0,10) }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        640,
+        0
+      ],
+      "id": "e9a78f80-407f-4da4-8e31-34c6813a4a9b",
+      "name": "Edit Fields"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Google Drive Trigger": {
+      "main": [
+        [
+          {
+            "node": "Download file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download file": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert rows in a table": {
+      "main": [
+        []
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Insert rows in a table",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "f9df0090-5540-41e6-9444-810b81d1c464",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "4c3dbe3894ab710f326c26d11c6ecec079c34a06bc913264e09a56da68111e85"
+  },
+  "id": "8u7Rd2Df3wkXjMg5",
+  "tags": []
+}
