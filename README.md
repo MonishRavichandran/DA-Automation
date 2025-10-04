@@ -39,9 +39,11 @@ Updates the MySQL database using an upsert strategy (avoids duplicates).
 
 3️⃣ MySQL Database
 
-Stores a clean, well-structured dataset for analytics and reporting.
+Stores dataset for analytics and reporting.
 
 4️⃣ Power BI Dashboard
+
+Dataset get cleaned through power query to make the dataset clean and well setructured.
 
 Automatically refreshes to reflect the latest data.
 
